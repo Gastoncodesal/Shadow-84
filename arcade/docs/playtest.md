@@ -41,3 +41,17 @@ Comprobar en Godot 4: aparición de Raiden tras completar exactamente tres olead
 **Cambios en código:** formación 3 dividida en dos escuadrones, menos salud total de enemigos y menos disparos, avisos visuales, dash con recarga, patrones oscilantes, combo y cuatro pistas musicales. Raiden reducido a 72 HP y ataque máximo reducido a nueve proyectiles activos.
 
 **Validación pendiente:** juego real de principio a fin con la nueva versión. Registrar número de intentos, duración y si los avisos son legibles. No se ha simulado un playtest humano.
+
+## Iteración cinematográfica 2.0 — 11/11/2026
+
+Se incorpora menú, diálogos con retratos originales, placas de transición, seis escuadrones repartidos en las tres oleadas, patrón de incursiones, barra de enemigos y efectos de sonido. Se mantienen las banderas y los tres finales. **Estado:** validación programática de archivos realizada; comprobación de funcionamiento en Godot pendiente. El jugador debe completar, a mano, la valoración de dificultad y duración en cada capítulo.
+
+| Prueba manual | Registro |
+|---|---|
+| Iniciar por botón y por Enter | Pendiente |
+| Llegar a ambas rondas de cada capítulo | Pendiente |
+| Contrastar rescate y arsenal | Pendiente |
+| Ver tres fases y derrotar a Raiden | Pendiente |
+| Verificar tres desenlaces | Pendiente |
+| Probar volumen, silencio y M | Pendiente |
+| Medir duración real y número de muertes | Pendiente |

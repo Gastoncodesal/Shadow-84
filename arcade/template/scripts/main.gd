@@ -1,10 +1,11 @@
 extends Node2D
 ## SHADOW//84 — Edición equilibrada: oleadas con mecánicas distintas, avisos y jefe jugable.
 ## Se conserva la máquina narrativa y la estructura del TP NEÓN 84.
-enum Fase { HISTORIA, OLEADA, JEFE, FINAL }
+enum Fase { HISTORIA, OLEADA, JEFE, FINAL, MENU }
 
 @export var enemigo_escena: PackedScene
 const JEFE_ESCENA := preload("res://escenas/Jefe.tscn")
+const PANTALLA_INICIO := preload("res://scripts/pantalla_inicio.gd")
 const IMPACTO_SCRIPT := preload("res://scripts/arte/impacto.gd")
 const AVISO_SCRIPT := preload("res://scripts/arte/aviso_ataque.gd")
 const PROYECTIL_ESCENA := preload("res://escenas/ProyectilEnemigo.tscn")
@@ -16,6 +17,13 @@ const MUSICAS := [
     preload("res://audio/nucleo.wav")
 ]
 const VIDAS_INICIALES := 3
+const EFECTOS := {
+    "shuriken": preload("res://audio/fx_shuriken.wav"),
+    "impacto": preload("res://audio/fx_impacto.wav"),
+    "dano": preload("res://audio/fx_dano.wav"),
+    "boss": preload("res://audio/fx_boss.wav"),
+    "dash": preload("res://audio/fx_dash.wav")
+}
 const ESPACIO_X := 52.0
 const ESPACIO_Y := 45.0
 const MARGEN_FORMACION := 30.0
@@ -25,13 +33,13 @@ const LIMITE_INFERIOR := 608.0
 ## Dificultad por etapa: variedad por composición, ritmo y disparos anunciados.
 ## El episodio 3 se divide en dos escuadrones más pequeños: NO 32 blindados a la vez.
 const OLEADAS := [
-    {"filas": 2, "columnas": 7, "puntos": 12, "paso": 20.0, "espera": 0.43, "hp": 1, "fuego": 2.60, "vel_bala": 170.0, "max_balas": 3},
-    {"filas": 3, "columnas": 6, "puntos": 18, "paso": 23.0, "espera": 0.38, "hp": 1, "fuego": 2.05, "vel_bala": 189.0, "max_balas": 4},
-    {"filas": 2, "columnas": 6, "puntos": 25, "paso": 24.0, "espera": 0.39, "hp": 1, "fuego": 1.85, "vel_bala": 198.0, "max_balas": 5},
+    {"filas": 2, "columnas": 6, "puntos": 12, "paso": 19.0, "espera": 0.48, "hp": 1, "fuego": 2.70, "vel_bala": 166.0, "max_balas": 3},
+    {"filas": 2, "columnas": 7, "puntos": 18, "paso": 22.0, "espera": 0.41, "hp": 1, "fuego": 2.15, "vel_bala": 186.0, "max_balas": 4},
+    {"filas": 3, "columnas": 5, "puntos": 25, "paso": 23.0, "espera": 0.40, "hp": 1, "fuego": 2.00, "vel_bala": 194.0, "max_balas": 5},
 ]
 const COLORES := [Color("34e9e8"), Color("f6af5b"), Color("fa5d9c")]
 const TITULOS := ["01 // AZOTEAS DE NEO-KYOTO", "02 // DISTRITO DE LA FORJA", "03 // CIUDADELA KUROGANE"]
-var fase: Fase = Fase.HISTORIA
+var fase: Fase = Fase.MENU
 var puntaje := 0
 var vidas := VIDAS_INICIALES
 var oleada_actual := -1
@@ -54,6 +62,10 @@ var _btn_mute: Button
 var _volumen: HSlider
 var _silenciado := false
 var _volumen_anterior := 0.5
+var _menu: CanvasLayer
+var _gracia_entrada := 0.0
+var _sfx: Array[AudioStreamPlayer] = []
+var _tiempo_intro := 0.0
 
 @onready var jugador = $Jugador
 @onready var formacion = $Formacion
@@ -65,22 +77,38 @@ var _volumen_anterior := 0.5
 func _ready() -> void:
     _azar.randomize()
     jugador.murio.connect(_on_jugador_murio)
+    jugador.disparo_realizado.connect(func() -> void: _sonar("shuriken", -12.0))
+    jugador.esquivo.connect(func() -> void: _sonar("dash", -7.5))
     dialogo.opcion_elegida.connect(_on_opcion_elegida)
     dialogo.continuo.connect(_on_continuo)
     guion.nodo_mostrado.connect(_on_nodo_mostrado)
     guion.guion_terminado.connect(_on_guion_terminado)
     _configurar_audio()
+    _configurar_efectos()
     _cargar_mejor_puntaje()
     actualizar_hud()
-    if guion.cargar(ARCHIVO_GUION):
-        guion.empezar()
-    else:
+    if not guion.cargar(ARCHIVO_GUION):
+        push_error("No se pudo abrir el guion de SHADOW//84")
+    _menu = CanvasLayer.new()
+    _menu.set_script(PANTALLA_INICIO)
+    add_child(_menu)
+    _menu.connect("comenzar", _comenzar_partida)
+
+func _comenzar_partida() -> void:
+    if fase != Fase.MENU:
+        return
+    fase = Fase.HISTORIA
+    if guion.nodos.is_empty():
         _iniciar_oleada(0)
+    else:
+        guion.empezar()
 
 func _process(delta: float) -> void:
     if fase == Fase.OLEADA:
-        _mover_formacion(delta)
-        _disparar_enemigos(delta)
+        _gracia_entrada = maxf(0.0, _gracia_entrada - delta)
+        if _gracia_entrada <= 0.0:
+            _mover_formacion(delta)
+            _disparar_enemigos(delta)
         _procesar_avisos(delta)
     elif fase == Fase.FINAL and Input.is_action_just_pressed("ui_accept"):
         _reiniciar()
@@ -138,12 +166,14 @@ func _iniciar_oleada(indice: int) -> void:
     oleada_actual = indice
     _suboleada = 0
     _contador_ataques = 0
+    _gracia_entrada = 2.0
     fase = Fase.OLEADA
     fondo.cambiar_escenario(indice)
     _cambiar_musica(indice)
     hud.ocultar_mensaje()
     hud.ocultar_jefe()
     hud.anunciar(TITULOS[indice])
+    hud.anunciar_capitulo(indice)
     jugador.doble_canon = bool(guion.banderas.get("doble_canon", false))
     if bool(guion.banderas.get("vida_extra", false)) and not bool(guion.banderas.get("vida_aplicada", false)):
         vidas += 1
@@ -157,12 +187,20 @@ func _crear_escuadron(indice: int, ronda: int) -> void:
     var cfg: Dictionary = OLEADAS[indice]
     var filas: int = int(cfg["filas"])
     var columnas: int = int(cfg["columnas"])
-    if indice == 2 and ronda == 1:
-        filas = 3
-        columnas = 5
+    if ronda == 1:
+        if indice == 0:
+            filas = 2
+            columnas = 5
+        elif indice == 1:
+            filas = 3
+            columnas = 5
+        else:
+            filas = 2
+            columnas = 6
     formacion_dir = -1 if ronda == 1 else 1
     _tiempo_paso = 0.0
-    _tiempo_disparo = 3.25 if ronda == 1 else 2.2
+    _tiempo_disparo = 3.0 if ronda == 1 else 2.6
+    _gracia_entrada = 1.6 if ronda == 1 else 2.0
     _ancho_formacion = float(columnas - 1) * ESPACIO_X
     for fila in range(filas):
         for columna in range(columnas):
@@ -170,23 +208,35 @@ func _crear_escuadron(indice: int, ronda: int) -> void:
             var hp := 1
             var tipo := (fila + indice + ronda) % 3
             # Sólo unidades blindadas concretas requieren 2 o 3 impactos.
-            if indice == 1 and fila == 0 and columna % 2 == 0:
+            if indice == 1 and fila == 0 and columna % 3 == 0:
                 hp = 2
             elif indice == 2 and fila == 0 and columna % 3 == 1:
                 hp = 2
-            # El centinela insignia del segundo escuadrón resiste tres golpes.
-            if indice == 2 and ronda == 1 and fila == 0 and columna == 2:
+            # Sólo un centinela élite por capítulo, fácilmente reconocible.
+            if indice == 2 and ronda == 1 and fila == 0 and columna == 3:
                 hp = 3
                 tipo = 2
             enemigo.configurar(tipo, hp, int(cfg["puntos"]) * (filas - fila))
             enemigo.destruido.connect(_on_enemigo_destruido.bind(enemigo))
+            enemigo.golpeado.connect(func() -> void: _sonar("impacto", -11.0))
             formacion.add_child(enemigo)
             var desfase := 13.0 if indice == 1 and fila == 1 and columna % 2 == 0 else 0.0
             enemigo.position = Vector2(float(columna) * ESPACIO_X + desfase, float(fila) * ESPACIO_Y)
-            enemigo.configurar_patron(indice, float(columna) * 0.75 + float(fila))
+            # La coreografía cambia por capítulo y por escuadrón.
+            var patron := indice
+            if indice == 0 and ronda == 1 and columna % 3 == 0:
+                patron = 1
+            if indice == 1 and ronda == 1 and columna % 3 == 1:
+                patron = 3
+            if indice == 2 and columna % 3 == 2:
+                patron = 3
+            enemigo.configurar_patron(patron, float(columna) * 0.75 + float(fila))
             enemigos.append(enemigo)
     _enemigos_iniciales = enemigos.size()
+    hud.actualizar_progreso(enemigos.size(), _enemigos_iniciales)
     formacion.position = Vector2(240.0 - _ancho_formacion / 2.0, 152.0 if ronda == 0 else 143.0)
+    if ronda > 0:
+        hud.anunciar("AIKO // SEGUNDO ESCUADRÓN · CAMBIAN LOS PATRONES", 2.4)
 
 func _mover_formacion(delta: float) -> void:
     if enemigos.is_empty():
@@ -210,7 +260,9 @@ func _mover_formacion(delta: float) -> void:
         formacion_dir *= -1
         formacion.position.x = clampf(formacion.position.x, limite_izq, limite_der)
         formacion.position.y += BAJADA_FORMACION
-        var max_filas: int = 3 if oleada_actual == 2 and _suboleada == 1 else int(cfg["filas"])
+        var max_filas: int = 2 if oleada_actual == 2 and _suboleada == 1 else int(cfg["filas"])
+        if oleada_actual == 1 and _suboleada == 1:
+            max_filas = 3
         var altura: float = float(max_filas - 1) * ESPACIO_Y + 19.0
         if formacion.position.y + altura >= LIMITE_INFERIOR:
             _finalizar_partida("NEO-KYOTO HA CAÍDO", "La defensa de Kurogane alcanzó el refugio.")
@@ -277,29 +329,33 @@ func _on_enemigo_destruido(puntos: int, enemigo: Node2D) -> void:
     if not enemigos.has(enemigo):
         return
     if puntos > 0:
+        if enemigos.size() == int(ceil(float(_enemigos_iniciales) / 2.0)) and fase == Fase.OLEADA:
+            var dialogos := ["AIKO // EL CIELO EMPIEZA A DESPEJARSE", "AIKO // LAS PATRULLAS SE REORGANIZAN", "AIKO // SOLO QUEDA ROMPER LA ÚLTIMA LÍNEA"]
+            hud.anunciar(dialogos[clampi(oleada_actual, 0, 2)], 2.2)
         _combo = mini(_combo + 1, 5) if _tiempo_combo > 0.0 else 1
         _tiempo_combo = 2.4
         puntaje += puntos * _combo
         _crear_impacto(enemigo.global_position, COLORES[clampi(oleada_actual, 0, 2)])
+        _sonar("impacto", -12.0)
     enemigos.erase(enemigo)
+    hud.actualizar_progreso(enemigos.size(), _enemigos_iniciales)
     actualizar_hud()
     if enemigos.is_empty() and fase == Fase.OLEADA:
         _oleada_superada()
 
 func _oleada_superada() -> void:
     _borrar_proyectiles()
-    if oleada_actual == 2 and _suboleada == 0:
-        # Un respiro entre las dos defensas finales: sin duplicar toda la narrativa.
+    if _suboleada == 0:
+        # Cada capítulo tiene dos segmentos: diferentes patrones y un respiro.
         _suboleada = 1
         _crear_escuadron(oleada_actual, _suboleada)
-        if vidas < 3:
+        if oleada_actual == 2 and vidas < 3:
             vidas += 1
-            hud.anunciar("AIKO // REFUERZOS Y +1 VIDA", 3.1)
-        else:
-            hud.anunciar("AIKO // SEGUNDO ESCUADRÓN", 3.1)
+            hud.anunciar("AIKO // REFUERZOS · +1 VIDA", 3.1)
         actualizar_hud()
         return
     fase = Fase.HISTORIA
+    hud.ocultar_progreso()
     var siguiente := oleada_actual + 1
     if siguiente >= OLEADAS.size():
         if not _mostrar_nodo_si_existe("JEFE_PREP"):
@@ -315,10 +371,20 @@ func _iniciar_jefe() -> void:
     fondo.cambiar_escenario(3)
     _cambiar_musica(3)
     hud.ocultar_mensaje()
+    hud.ocultar_progreso()
     hud.anunciar("JEFE FINAL // RAIDEN", 3.5)
+    hud.anunciar_capitulo(3)
+    _sonar("boss", -6.0)
     _jefe = JEFE_ESCENA.instantiate()
     add_child(_jefe)
     _jefe.position = Vector2(240, 214)
+    if bool(guion.banderas.get("sigilo", false)):
+        _jefe.energia_maxima = 60
+        _jefe.energia = 60
+        hud.anunciar("INFILTRACIÓN // ARMADURA DE RAIDEN DEBILITADA", 3.0)
+    if bool(guion.banderas.get("proteccion", false)) and vidas < 4:
+        vidas += 1
+        actualizar_hud()
     _jefe.derrotado.connect(_on_jefe_derrotado)
     _jefe.energia_cambiada.connect(_on_energia_jefe)
     _jefe.fase_cambiada.connect(_on_fase_jefe)
@@ -341,6 +407,7 @@ func _on_jefe_derrotado() -> void:
     fase = Fase.HISTORIA
     puntaje += 2500
     _crear_impacto(_jefe.global_position, Color("ff6486"), 3.5)
+    _sonar("boss", -4.0)
     hud.ocultar_jefe()
     _borrar_proyectiles()
     actualizar_hud()
@@ -358,6 +425,10 @@ func _on_jugador_murio() -> void:
     if fase != Fase.OLEADA and fase != Fase.JEFE:
         return
     vidas -= 1
+    _combo = 0
+    _tiempo_combo = 0.0
+    _sonar("dano", -6.0)
+    hud.indicar_dano()
     _crear_impacto(jugador.global_position, Color("fa749c"), 1.5)
     actualizar_hud()
     if vidas <= 0:
@@ -374,6 +445,7 @@ func _finalizar_partida(titulo: String, mensaje: String) -> void:
     if is_instance_valid(_jefe):
         _jefe.queue_free()
     hud.ocultar_jefe()
+    hud.ocultar_progreso()
     if puntaje > mejor_puntaje:
         mejor_puntaje = puntaje
         _guardar_mejor_puntaje()
@@ -465,6 +537,25 @@ func _configurar_audio() -> void:
     _cambiar_volumen(guardado)
     _audio.play()
 
+func _configurar_efectos() -> void:
+    # Pool de jugadores para no cortar el audio al lanzar varios shurikens.
+    for i in range(8):
+        var reproductor := AudioStreamPlayer.new()
+        reproductor.bus = "Master"
+        reproductor.process_mode = Node.PROCESS_MODE_PAUSABLE
+        add_child(reproductor)
+        _sfx.append(reproductor)
+
+func _sonar(nombre: String, ganancia_db: float = -10.0) -> void:
+    if _silenciado:
+        return
+    for efecto in _sfx:
+        if not efecto.playing:
+            efecto.stream = EFECTOS[nombre]
+            efecto.volume_db = ganancia_db + linear_to_db(maxf(_volumen.value, 0.01))
+            efecto.play()
+            return
+
 func _cambiar_musica(indice: int) -> void:
     if _audio == null:
         return
@@ -480,6 +571,9 @@ func _cambiar_volumen(valor: float) -> void:
     _btn_mute.text = "×" if _silenciado else "♪"
     _audio.volume_db = linear_to_db(maxf(valor, 0.0001))
     _audio.stream_paused = _silenciado
+    if _silenciado:
+        for efecto in _sfx:
+            efecto.stop()
     if not _silenciado:
         _volumen_anterior = valor
     var cfg := ConfigFile.new()

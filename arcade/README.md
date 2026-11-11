@@ -1,11 +1,11 @@
-# SHADOW//84 — Trabajo práctico final
+# SHADOW//84 — La última sombra (edición cinematográfica 2.0)
 
-Carpeta de entrega basada en el template del TP **NEÓN 84**.
+Proyecto final en **Godot 4** basado en el template académico `NEÓN 84`.
 
-1. Abrir `template/project.godot` con **Godot 4**.
-2. Presionar **F5** para jugar.
-3. Leer `template/README.md` para controles, niveles, jefe final y prueba automática.
-4. Revisar `docs/diseno_narrativo.md`, `docs/arte_visual.md`, `docs/ajustes_jugabilidad.md` y `docs/playtest.md` para documentación académica.
-5. La primera apertura importa los PNG de `template/recursos/`; no borrar esa carpeta.
+**Para jugar:** importar `template/project.godot` en Godot y ejecutar F5.
 
-**Nota de QA:** se hizo comprobación estática de archivos y guion fuera de Godot. Se requiere ejecutar el juego completo y el test en Godot 4, y realizar el playtest real con tres personas antes de entregar al docente.
+**Entregables:** `docs/diseno_narrativo.md` (E1), `template/guion/capitulo_1.json` (E2), código/escenas/arte/audio del juego en `template/` (E3), y `docs/playtest.md` (E4, a completar con pruebas humanas).
+
+**Novedades 2.0:** menú inicial ilustrado, transmisiones con retratos de Ren/Aiko/Raiden, placas de capítulo, ambientación diferenciada, seis escuadrones en tres oleadas, patrón de incursión, combos, dash, Raiden con tres fases y efectos originales.
+
+**Documentación completa:** ver `template/README.md` y `docs/actualizacion_cinematografica.md`.

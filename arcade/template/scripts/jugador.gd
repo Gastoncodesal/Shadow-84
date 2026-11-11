@@ -1,6 +1,8 @@
 extends CharacterBody2D
 ## Ren: movimiento, shurikens, daño temporalmente bloqueado y esquiva (SHIFT).
 signal murio
+signal disparo_realizado
+signal esquivo
 @export var disparo_escena: PackedScene
 const VELOCIDAD := 312.0
 const ENFRIAMIENTO := 0.265
@@ -49,15 +51,17 @@ func _intentar_dash(ancho: float) -> void:
     if absf(nuevo_x - position.x) < 16.0:
         return
     position.x = nuevo_x
+    esquivo.emit()
     _recarga_dash = RECARGA_DASH
     _invulnerabilidad_restante = maxf(_invulnerabilidad_restante, 0.43)
     invulnerable = true
-    $Sprite.atacar()
+    $Sprite.esquivar(_ultima_direccion)
 
 func tiempo_para_dash() -> float:
     return _recarga_dash
 
 func _disparar() -> void:
+    disparo_realizado.emit()
     _enfriamiento = ENFRIAMIENTO if not doble_canon else ENFRIAMIENTO + 0.042
     $Sprite.atacar()
     var posiciones := [position + Vector2(0, -30)]

@@ -95,7 +95,7 @@ color = Color(0.01, 0.02, 0.07, 0.69)
 
 [node name="Panel" type="PanelContainer" parent="DialogoUI"]
 offset_left = 20.0
-offset_top = 408.0
+offset_top = 383.0
 offset_right = 460.0
 offset_bottom = 685.0
 

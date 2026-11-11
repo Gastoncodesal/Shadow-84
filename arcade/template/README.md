@@ -1,59 +1,73 @@
-# SHADOW//84 — La última sombra
+# SHADOW//84 — LA ÚLTIMA SOMBRA
 
-**Trabajo práctico final — Introducción a la Programación (Godot 4.x).**
+**Arcade ninja cyberpunk en Godot 4 — trabajo práctico final de Introducción a la Programación.**
 
-Arcade ninja cyberpunk construido sobre el template académico NEÓN 84: **tres oleadas de centinelas**, disparos, colisiones, vidas, puntaje, récord persistente, decisiones narrativas con banderas, **Raiden como jefe final de tres fases** y tres desenlaces.
+Versión **2.0 cinematográfica**. El proyecto continúa el template académico **NEÓN 84** y mantiene los requisitos de tres oleadas, movimiento lateral, shurikens, vidas, puntaje récord, guion JSON, decisiones con banderas, condiciones, convergencias y tres finales. Se han agregado un menú ilustrado, retratos, seis escuadrones agrupados en tres capítulos, fondos narrativos, jefe Raiden de tres fases, efectos de sonido y transiciones.
 
-## Ejecutar
+## Abrir y ejecutar
 
-Importar `project.godot` en Godot 4 y presionar **F5**. La primera apertura puede tardar mientras se importan las texturas PNG.
+1. Instalar **Godot 4.x** (la misma versión que se usó para abrir la edición anterior).
+2. Importar **`arcade/template/project.godot`** y esperar la importación de imágenes y sonidos.
+3. Presionar **F5**; elegir **COMENZAR MISIÓN** o Enter.
+4. Continuar y seleccionar opciones con el mouse. Se puede hacer clic en Continuar para revelar inmediatamente un diálogo y una segunda vez para avanzar.
 
-| Acción | Control |
-| --- | --- |
-| Mover a Ren | Flechas ← → |
-| Lanzar shurikens | ESPACIO o ENTER |
-| Esquivar disparos con dash (recarga: 4 s) | SHIFT; dirección según último movimiento |
-| Silenciar / activar | Tecla M o botón ♪/× |
-| Ajustar volumen | Barra superior derecha |
-| Reiniciar al terminar | ENTER |
+## Controles
 
-## Recorrido equilibrado
+| Control | Acción |
+|---|---|
+| Flechas izquierda/derecha | Movimiento horizontal |
+| Espacio / Enter | Lanzamiento de shurikens; mantener para disparar con enfriamiento |
+| Shift | Dash invulnerable breve, recarga 4 segundos y dirección según último desplazamiento |
+| M / botón ♪ | Silenciar y reactivar |
+| Barra de volumen | Regular música y efectos |
+| Enter en pantalla final | Reiniciar desde el menú |
 
-1. **Azoteas de Neo-Kyoto:** patrulla de 2×7 enemigos de un impacto. Disparos simples y espaciados; aprendizaje de controles.
-2. **Distrito de la Forja:** 3×6 drones con trayectorias oscilantes y blindaje selectivo. Alterna disparos anunciados y ocasional ráfaga doble.
-3. **Ciudadela Kurogane:** dos escuadrones sucesivos de 2×6 y 3×5. La mayoría de los soldados cae de un impacto; pocas unidades élite resisten dos o tres. Disparos anunciados, máximo cinco proyectiles hostiles en pantalla y un refuerzo de +1 vida si quedan menos de tres.
-4. **Núcleo de Kurogane:** Raiden, jefe final de **72 HP** repartidos en tres fases de 24 HP. Sus patrones cambian progresivamente, muestran una línea de aviso y nunca generan la antigua saturación de 27 balas.
+## Historia y decisiones
 
-**Novedades de ritmo:** cada fase posee música original distinta, los escuadrones 2 y 3 tienen movimientos serpentinos, los enemigos telegráfan sus ataques, los combos multiplican el puntaje hasta x5 y Ren puede esquivar cada cuatro segundos.
+Ren, último ninja del clan Kurohane, combate el régimen tecnológico de Kurogane en Neo-Kyoto. Aiko acompaña la infiltración, mientras Raiden intenta demostrar que la libertad causa caos.
 
-En el guion, **liberar prisioneros** agrega una vida y **recuperar el arsenal** activa tres shurikens. Las elecciones se serializan en `guion/capitulo_1.json`.
+- **Rescate / archivos** cambia las banderas narrativas y una opción de diálogo posterior.
+- **Liberar prisioneros** entrega una vida extra; **recuperar arsenal** desbloquea triple shuriken.
+- **Proteger civiles** entrega ayuda adicional antes de Raiden; **infiltrarse en sigilo** reduce su blindaje de 72 a 60 unidades de energía.
+- Después del jefe se accede a **tres finales**: sacrificio, despertar o nuevo shogun.
 
-## Arquitectura y estudio
+## Capítulos y dificultad
 
-- `scripts/main.gd`: máquina de fases, oleadas, disparos enemigos, Raiden, récord y audio.
-- `scripts/jugador.gd`: movimiento, dash con recarga, cooldown, invulnerabilidad de 1,75 s y triple disparo.
-- `scripts/enemigo.gd`: impacto, HP y puntuación por fila.
-- `scripts/jefe.gd`: 72 HP, ataques anunciados, fases, patrones y señal de derrota.
-- `scripts/proyectil_enemigo.gd`: balas hostiles.
-- `scripts/guion_manager.gd`: evaluación de condiciones, efectos y saltos narrativos.
-- `scripts/dialogo_ui.gd`: UI narrativa con elecciones.
-- `scripts/hud.gd`: marcador, barra del jefe, transiciones y pantalla de fin.
-- `scripts/arte/`: dibujo/animación de sprites y efectos climáticos.
-- `recursos/`: sprites originales PNG y cuatro escenarios; arte generado para este trabajo.
+| Tramo | Composición | Identidad jugable | Escenario |
+|---|---|---|---|
+| 1. Azoteas | 2 × 6 + 2 × 5 | Formación clásica, tiros separados y segunda ronda con patrullas oscilantes | Ciudad lluviosa |
+| 2. La Forja | 2 × 7 + 3 × 5 | Unidades con movimiento lateral, entradas verticales y blindaje selectivo | Zona industrial |
+| 3. Ciudadela | 3 × 5 + 2 × 6 | Patrullas serpentinas e incursiones anticipables; algunas unidades blindadas | Fortaleza Kurogane |
+| 4. Núcleo | Raiden con 72 HP, o 60 si elegiste sigilo | Tres fases de abanicos y ataques anunciados; máximo nueve balas hostiles | Cámara del núcleo |
 
-## Test automatizado
+La dificultad no aumenta simplemente añadiendo más enemigos: hay descansos entre escuadrones, ataque telegráfico, dash y un refuerzo de vida si la Ciudadela te deja con pocas vidas. El juego no tiene cronómetro obligatorio: su duración real depende de las decisiones, la puntería y los reintentos.
 
-En un entorno con Godot 4 instalado:
+## Arquitectura para la defensa oral
 
-```sh
+- `scripts/main.gd`: controlador de fases **MENU → HISTORIA → OLEADA → JEFE → FINAL**, audio y coordinación.
+- `scripts/pantalla_inicio.gd`: portada interactiva diseñada mediante nodos Control.
+- `scripts/jugador.gd`: movimiento, enfriamiento de shurikens, triple disparo y dash.
+- `scripts/enemigo.gd`: resistencia, colisiones y patrones 0–3.
+- `scripts/jefe.gd`: 72 HP, fases y patrones, avisos visuales.
+- `scripts/guion_manager.gd`: carga de JSON, flags, condiciones, efectos y saltos.
+- `scripts/dialogo_ui.gd`: retratos, escritura progresiva, botones de elección.
+- `scripts/hud.gd`: barras, hit feedback, placas de capítulo, récord y final.
+- `scripts/arte/`: dibujos, animaciones y atmósfera ambiental.
+- `recursos/`: **sprites propios**, cuatro escenas, retratos y placas.
+- `audio/`: pistas por capítulo y efectos de sonido originales sintetizados.
+
+## Pruebas
+
+Desde `arcade/template`, con Godot disponible:
+
+```bash
 godot --headless --path . --script res://tests/recorrer_juego.gd
 ```
 
-El script verifica tres oleadas (incluyendo dos escuadrones en el tercero), 72 impactos al jefe, sus tres fases y la llegada al epílogo. **El test debe ejecutarse en una computadora con Godot**; no sustituye al playtest humano.
+El test recorre **menú, tres capítulos (seis escuadrones), jefe con sus tres fases, diálogos y un final**. Además se valida el grafo y la accesibilidad de los tres finales. El verificador de archivos puede ejecutarse sin Godot desde la raíz de `arcade/`:
 
-## Entregables
+```bash
+python herramientas/verificar_entrega.py
+```
 
-- `../docs/diseno_narrativo.md` — E1: seis pasos y beats.
-- `guion/capitulo_1.json` — E2: grafo de decisiones.
-- Código, escenas, recursos — E3.
-- `../docs/playtest.md` — E4: checklist y formulario para tres personas (pendiente de completar con resultados reales).
+**Limitación:** la verificación de archivos no sustituye al arranque real del motor ni a un playtest de personas. Registrar el resultado real del test en `../docs/playtest.md`. No declarar pruebas humanas realizadas antes de completarlas.
