@@ -1,0 +1,19 @@
+[gd_scene load_steps=5 format=3 uid="uid://bn84jugador"]
+
+[ext_resource type="Script" path="res://scripts/jugador.gd" id="1_jugador"]
+[ext_resource type="PackedScene" path="res://escenas/Disparo.tscn" id="2_disparo"]
+
+[ext_resource type="Script" path="res://scripts/arte/ninja.gd" id="9_arte"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cuerpo"]
+size = Vector2(32, 43)
+
+[node name="Jugador" type="CharacterBody2D"]
+script = ExtResource("1_jugador")
+disparo_escena = ExtResource("2_disparo")
+
+[node name="Sprite" type="Node2D" parent="."]
+script = ExtResource("9_arte")
+
+[node name="Collision" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_cuerpo")

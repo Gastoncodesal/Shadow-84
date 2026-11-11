@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://bn84disparo"]
+
+[ext_resource type="Script" path="res://scripts/disparo.gd" id="1_disparo"]
+
+[ext_resource type="Script" path="res://scripts/arte/shuriken.gd" id="9_arte"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bala"]
+size = Vector2(4, 12)
+
+[node name="Disparo" type="Area2D"]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("1_disparo")
+
+[node name="Sprite" type="Node2D" parent="."]
+script = ExtResource("9_arte")
+
+[node name="Collision" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_bala")

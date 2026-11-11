@@ -1,0 +1,298 @@
+{
+  "titulo": "SHADOW//84 — La última sombra",
+  "entrada": "INTRO_01",
+  "nodos": {
+    "INTRO_01": {
+      "spk": "AIKO",
+      "lineas": [
+        "Neo-Kyoto, 2084. El Protocolo Silencio comienza al amanecer.",
+        "Ren, sos la última sombra de Kurohane. La ciudad necesita una decisión."
+      ],
+      "opciones": [],
+      "notas_direccion": "Pausa breve; tono contenido",
+      "goto": "INTRO_02"
+    },
+    "INTRO_02": {
+      "spk": "REN",
+      "lineas": [
+        "No vine a recuperar un nombre. Vine a impedir otra noche sin voces."
+      ],
+      "opciones": [],
+      "notas_direccion": "Pausa breve; tono contenido",
+      "goto": "INTRO_DECISION"
+    },
+    "INTRO_DECISION": {
+      "spk": "AIKO",
+      "lineas": [
+        "Un refugio está rodeado. Los archivos de tu clan también están al alcance.",
+        "Sólo hay tiempo para una operación."
+      ],
+      "opciones": [
+        {
+          "txt": "Salvar a las familias",
+          "cond": "",
+          "efecto": "civiles = true; honor += 1",
+          "goto": "INTRO_CIVILES"
+        },
+        {
+          "txt": "Recuperar los archivos",
+          "cond": "",
+          "efecto": "archivos = true; conocimiento += 1",
+          "goto": "INTRO_ARCHIVOS"
+        }
+      ],
+      "notas_direccion": "Pausa breve; tono contenido"
+    },
+    "INTRO_CIVILES": {
+      "spk": "REN",
+      "lineas": [
+        "Los nombres importan más que los secretos. Aiko, abrí la ruta de evacuación."
+      ],
+      "opciones": [],
+      "notas_direccion": "Pausa breve; tono contenido",
+      "goto": "INTRO_CONVERGE"
+    },
+    "INTRO_ARCHIVOS": {
+      "spk": "REN",
+      "lineas": [
+        "Si mi clan construyó esto, sus archivos pueden detenerlo."
+      ],
+      "opciones": [],
+      "notas_direccion": "Pausa breve; tono contenido",
+      "goto": "INTRO_CONVERGE"
+    },
+    "INTRO_CONVERGE": {
+      "spk": "AIKO",
+      "lineas": [
+        "Los centinelas ya te detectaron. Sobreviví a la primera barrera."
+      ],
+      "opciones": [],
+      "notas_direccion": "Pausa breve; tono contenido"
+    },
+    "ENTRE_01": {
+      "spk": "RAIDEN",
+      "lineas": [
+        "El último Kurohane. Qué extraño: venís a destruir la máquina que tu maestro diseñó."
+      ],
+      "opciones": [],
+      "notas_direccion": "Pausa breve; tono contenido",
+      "goto": "ENTRE_01_DECISION"
+    },
+    "ENTRE_01_DECISION": {
+      "spk": "AIKO",
+      "lineas": [
+        "Hay prisioneros en la estación y un arsenal de shurikens experimentales.",
+        "Tu elección cambiará lo que podés hacer en combate."
+      ],
+      "opciones": [
+        {
+          "txt": "Liberar prisioneros: ganar una vida",
+          "cond": "",
+          "efecto": "prisioneros = true; honor += 1; vida_extra = true",
+          "goto": "ENTRE_01_RESCATE"
+        },
+        {
+          "txt": "Recuperar arsenal: triple shuriken",
+          "cond": "",
+          "efecto": "arsenal = true; doble_canon = true",
+          "goto": "ENTRE_01_ARSENAL"
+        },
+        {
+          "txt": "Usar los archivos para abrir las celdas",
+          "cond": "archivos",
+          "efecto": "prisioneros = true; honor += 1; vida_extra = true; acceso_secreto = true",
+          "goto": "ENTRE_01_SECRETO"
+        }
+      ],
+      "notas_direccion": "Pausa breve; tono contenido"
+    },
+    "ENTRE_01_RESCATE": {
+      "spk": "REN",
+      "lineas": [
+        "No voy a cambiar vidas por armas. Los prisioneros están libres."
+      ],
+      "opciones": [],
+      "notas_direccion": "Pausa breve; tono contenido",
+      "goto": "ENTRE_01_CONVERGE"
+    },
+    "ENTRE_01_ARSENAL": {
+      "spk": "REN",
+      "lineas": [
+        "Tres hojas, una oportunidad. Que el acero sirva a los vivos."
+      ],
+      "opciones": [],
+      "notas_direccion": "Pausa breve; tono contenido",
+      "goto": "ENTRE_01_CONVERGE"
+    },
+    "ENTRE_01_SECRETO": {
+      "spk": "AIKO",
+      "lineas": [
+        "El código del clan abrió todas las celdas. Tu pasado salvó a alguien."
+      ],
+      "opciones": [],
+      "notas_direccion": "Pausa breve; tono contenido",
+      "goto": "ENTRE_01_CONVERGE"
+    },
+    "ENTRE_01_CONVERGE": {
+      "spk": "AIKO",
+      "lineas": [
+        "La segunda barrera está activa. No te detengas."
+      ],
+      "opciones": [],
+      "notas_direccion": "Pausa breve; tono contenido"
+    },
+    "ENTRE_02": {
+      "spk": "AIKO",
+      "lineas": [
+        "Debo decirte algo. Tu maestro no fue sólo una víctima.",
+        "Él creó el primer núcleo. Kurogane convirtió su sueño de paz en una prisión."
+      ],
+      "opciones": [],
+      "notas_direccion": "Pausa breve; tono contenido",
+      "goto": "ENTRE_02_REN"
+    },
+    "ENTRE_02_REN": {
+      "spk": "REN",
+      "lineas": [
+        "Creí que la venganza limpiaría el pasado.",
+        "Ahora entiendo: sólo mis decisiones pueden cambiar el futuro."
+      ],
+      "opciones": [],
+      "notas_direccion": "Pausa breve; tono contenido",
+      "goto": "ENTRE_02_DECISION"
+    },
+    "ENTRE_02_DECISION": {
+      "spk": "AIKO",
+      "lineas": [
+        "¿Cómo entrarás al núcleo?"
+      ],
+      "opciones": [
+        {
+          "txt": "Proteger los canales civiles",
+          "cond": "",
+          "efecto": "proteccion = true; honor += 1",
+          "goto": "ENTRE_02_PROTECCION"
+        },
+        {
+          "txt": "Preparar una intrusión silenciosa",
+          "cond": "",
+          "efecto": "sigilo = true; conocimiento += 1",
+          "goto": "ENTRE_02_SIGILO"
+        }
+      ],
+      "notas_direccion": "Pausa breve; tono contenido"
+    },
+    "ENTRE_02_PROTECCION": {
+      "spk": "REN",
+      "lineas": [
+        "Ninguna victoria vale una ciudad vacía."
+      ],
+      "opciones": [],
+      "notas_direccion": "Pausa breve; tono contenido",
+      "goto": "ENTRE_02_CONVERGE"
+    },
+    "ENTRE_02_SIGILO": {
+      "spk": "REN",
+      "lineas": [
+        "No verán la sombra hasta que sea tarde."
+      ],
+      "opciones": [],
+      "notas_direccion": "Pausa breve; tono contenido",
+      "goto": "ENTRE_02_CONVERGE"
+    },
+    "ENTRE_02_CONVERGE": {
+      "spk": "RAIDEN",
+      "lineas": [
+        "La última defensa espera. Vení y demostrá cuánto cuesta tu libertad."
+      ],
+      "opciones": [],
+      "notas_direccion": "Pausa breve; tono contenido"
+    },
+    "EPILOGO": {
+      "spk": "RAIDEN",
+      "lineas": [
+        "El núcleo está abierto. Sin mi control, la ciudad podría caer en el caos.",
+        "¿Qué elegís, último ninja?"
+      ],
+      "opciones": [
+        {
+          "txt": "Sacrificarme para destruir el núcleo",
+          "cond": "",
+          "efecto": "final_sacrificio = true",
+          "goto": "FIN_SACRIFICIO"
+        },
+        {
+          "txt": "Liberar la red y devolver la elección",
+          "cond": "",
+          "efecto": "final_despertar = true",
+          "goto": "FIN_DESPERTAR"
+        },
+        {
+          "txt": "Tomar el control del sistema",
+          "cond": "",
+          "efecto": "final_shogun = true",
+          "goto": "FIN_SHOGUN"
+        }
+      ],
+      "notas_direccion": "Pausa breve; tono contenido"
+    },
+    "FIN_SACRIFICIO": {
+      "spk": "REN",
+      "lineas": [
+        "EL ÚLTIMO SACRIFICIO",
+        "El núcleo cayó. Ren desapareció entre las luces.",
+        "Neo-Kyoto recuerda al hombre que eligió a los demás."
+      ],
+      "opciones": [],
+      "notas_direccion": "Pausa breve; tono contenido",
+      "fin": true,
+      "titulo": "EL ÚLTIMO SACRIFICIO",
+      "mensaje": "La ciudad es libre. Tu sombra permanece."
+    },
+    "FIN_DESPERTAR": {
+      "spk": "AIKO",
+      "lineas": [
+        "EL DESPERTAR",
+        "Las pantallas se apagaron y la gente volvió a hablar.",
+        "El futuro es incierto. Por primera vez, les pertenece."
+      ],
+      "opciones": [],
+      "notas_direccion": "Pausa breve; tono contenido",
+      "fin": true,
+      "titulo": "EL DESPERTAR",
+      "mensaje": "La libertad vuelve a Neo-Kyoto."
+    },
+    "FIN_SHOGUN": {
+      "spk": "RAIDEN",
+      "lineas": [
+        "EL NUEVO SHOGUN",
+        "El trono cambió de dueño. Los drones siguen vigilando.",
+        "La sombra que derrotó al tirano ahora lleva su corona."
+      ],
+      "opciones": [],
+      "notas_direccion": "Pausa breve; tono contenido",
+      "fin": true,
+      "titulo": "EL NUEVO SHOGUN",
+      "mensaje": "Ganaste el poder y perdiste tu propósito."
+    },
+    "JEFE_PREP": {
+      "spk": "AIKO",
+      "lineas": [
+        "La ciudadela ha caído. Pero el núcleo tiene un último guardián.",
+        "Raiden conectó su armadura al sistema. Si cae, caerá el Protocolo Silencio."
+      ],
+      "opciones": [],
+      "goto": "JEFE_ENTRADA",
+      "notas_direccion": "Alarma roja de fondo; pausa de anticipación"
+    },
+    "JEFE_ENTRADA": {
+      "spk": "RAIDEN",
+      "lineas": [
+        "Construí una paz sin miedo. Y vos la destruirías por una idea.",
+        "Ven, Kurohane. El núcleo no se entrega: se conquista."
+      ],
+      "opciones": [],
+      "notas_direccion": "Voz distorsionada; la armadura desciende. Inicia el combate de jefe."
+    }
+  }
+}
